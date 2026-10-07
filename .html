@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English for Academic and Professional Purposes</title>
+    <style>
+        :root {
+            --primary-color: #1a4d2e;
+            --secondary-color: #ff9f1c;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        /* Login Screen */
+        #login-screen {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-top: 50px;
+        }
+        .logo {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+            max-width: 400px;
+            margin: 0 auto 20px auto;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button.start-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button.start-btn:hover {
+            background-color: #11331e;
+        }
+        
+        /* Exam Screen */
+        #exam-screen {
+            display: none;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .timer-bar {
+            position: sticky;
+            top: 0;
+            background: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 0 0 10px 10px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .timer-warning {
+            background: #d9534f !important;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        .passage-box {
+            background: #e9ecef;
+            border-left: 5px solid var(--secondary-color);
+            padding: 20px;
+            margin: 30px 0 20px 0;
+            border-radius: 5px;
+        }
+        .passage-box h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        .question-block {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .question-block p {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .options label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .options label:hover {
+            background: #f0f0f0;
+        }
+        .options input {
+            margin-right: 10px;
+        }
+        .submit-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 5px;
+            font-size: 20px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 30px;
+            font-weight: bold;
+        }
+        .submit-btn:hover {
+            background-color: #e68a00;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen">
+        <img src="badas-nhs-logo.png" alt="Badas National High School Logo" class="logo">
+        <h2>Badas National High School</h2>
+        <h3>English for Academic and Professional Purposes</h3>
+        <p>You will have exactly <strong>40 minutes</strong> to complete 30 questions based on the provided passages. The test will auto-submit when the time expires.</p>
+        
+        <div class="form-group">
+            <label for="studentName">Full Name (Last Name, First Name)</label>
+            <input type="text" id="studentName" required placeholder="e.g., Dela Cruz, Juan">
+        </div>
+        <div class="form-group">
+            <label for="studentGrade">Grade & Section</label>
+            <input type="text" id="studentGrade" required placeholder="e.g., Grade 11 - STEM">
+        </div>
+        <button class="start-btn" onclick="startExam()">Start Examination</button>
+    </div>
+
+    <!-- EXAM SCREEN -->
+    <!-- Replace 'YOUR_FORM_ID' with your Formspree ID to connect to free form/SQL saving -->
+    <form id="exam-screen" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <input type="hidden" name="Student_Name" id="hiddenName">
+        <input type="hidden" name="Grade_Section" id="hiddenGrade">
+        
+        <div class="timer-bar" id="timerBar">Time Remaining: <span id="timeDisplay">40:00</span></div>
+
+        <!-- PASSAGE 1 -->
+        <div class="passage-box">
+            <h3>Passage 1: The Foundations of Academic Tone</h3>
+            <p>Academic texts are formally structured pieces of writing designed to inform, analyze, or argue on specific scholarly topics. To maintain credibility and objectivity, writers must strictly avoid personal biases, emotional reactions, and vague expressions. Furthermore, scholarly writing often utilizes specific features, such as hedging language—words like "may," "might," or "suggests"—which allow researchers to demonstrate cautious claims and avoid asserting unverified absolutes.</p>
+        </div>
+
+        <div class="question-block">
+            <p>1. Which of the following best defines the primary purpose of an academic text?</p>
+            <div class="options">
+                <label><input type="radio" name="q1" value="A" required> A. To express personal feelings and entertain readers through flexible structures.</label>
+                <label><input type="radio" name="q1" value="B"> B. To inform, analyze, or argue on a specific topic within a scholarly context using evidence-based pieces of writing.</label>
+                <label><input type="radio" name="q1" value="C"> C. To communicate directly with clients and managers to achieve rapid organizational goals.</label>
+                <label><input type="radio" name="q1" value="D"> D. To provide unstructured observations based solely on first-person perspectives.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>2. Which language feature is specifically used in academic writing to demonstrate uncertainty, cautious claims, or avoid unverified assertions?</p>
+            <div class="options">
+                <label><input type="radio" name="q2" value="A" required> A. Complex Sentences</label>
+                <label><input type="radio" name="q2" value="B"> B. Cohesive Devices</label>
+                <label><input type="radio" name="q2" value="C"> C. Jargon</label>
+                <label><input type="radio" name="q2" value="D"> D. Hedging Language</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>3. According to guidelines on transforming everyday language into academic language, which element must be strictly avoided to maintain an objective tone?</p>
+            <div class="options">
+                <label><input type="radio" name="q3" value="A" required> A. Discipline-specific terminology</label>
+                <label><input type="radio" name="q3" value="B"> B. Vague expressions and personal opinions</label>
+                <label><input type="radio" name="q3" value="C"> C. Complex sentence structures</label>
+                <label><input type="radio" name="q3" value="D"> D. Explanatory thesis statements</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>8. A student is editing a research paper and removes the phrase, "I think this is the best solution." Which characteristic of academic writing is the student directly applying?</p>
+            <div class="options">
+                <label><input type="radio" name="q8" value="A" required> A. Being clear and straightforward</label>
+                <label><input type="radio" name="q8" value="B"> B. Being objective by presenting ideas impartially</label>
+                <label><input type="radio" name="q8" value="C"> C. Using technical vocabulary</label>
+                <label><input type="radio" name="q8" value="D"> D. Utilizing cohesive devices</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>9. Read the excerpt: "The change may indicate a temporary shift, though the data suggests otherwise." Which academic language feature is being demonstrated by the highlighted words "may indicate" and "suggests"?</p>
+            <div class="options">
+                <label><input type="radio" name="q9" value="A" required> A. Field-specific vocabulary</label>
+                <label><input type="radio" name="q9" value="B"> B. Objectivity and formal language</label>
+                <label><input type="radio" name="q9" value="C"> C. Hedging for cautious interpretation</label>
+                <label><input type="radio" name="q9" value="D"> D. Simple, straightforward grammar</label>
+            </div>
+        </div>
+
+        <!-- PASSAGE 2 -->
+        <div class="passage-box">
+            <h3>Passage 2: The IMRaD Structure and Academic Formats</h3>
+            <p>Most empirical research papers rely on the universally recognized IMRaD structure: Introduction, Methods, Results, and Discussion. It is crucial that each section serves its distinct purpose. For instance, the Results section must strictly present factual data without bias or interpretation. It is only in the Discussion section where researchers interpret those findings, link them back to the original research question, and discuss limitations. Academic publishing takes many forms depending on the scope, ranging from short conference papers to comprehensive monographs written by a single author on a highly specialized topic.</p>
+        </div>
+
+        <div class="question-block">
+            <p>6. Which section of the standard academic text structure interprets findings, links them back to the research question, and discusses implications or limitations?</p>
+            <div class="options">
+                <label><input type="radio" name="q6" value="A" required> A. Introduction</label>
+                <label><input type="radio" name="q6" value="B"> B. Methods</label>
+                <label><input type="radio" name="q6" value="C"> C. Results</label>
+                <label><input type="radio" name="q6" value="D"> D. Discussion</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>7. What type of academic text is characterized as a detailed work on a single specialized topic, often written by one author?</p>
+            <div class="options">
+                <label><input type="radio" name="q7" value="A" required> A. Conference Paper</label>
+                <label><input type="radio" name="q7" value="B"> B. Edited Volume</label>
+                <label><input type="radio" name="q7" value="C"> C. Monograph</label>
+                <label><input type="radio" name="q7" value="D"> D. Thesis</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>15. A research paper presents its methodology using specific field data, transitions to data presentation using graphs, and then compares findings with previous studies. What standard structural format is this paper following?</p>
+            <div class="options">
+                <label><input type="radio" name="q15" value="A" required> A. Non-academic unstructured format</label>
+                <label><input type="radio" name="q15" value="B"> B. IMRaD Format</label>
+                <label><input type="radio" name="q15" value="C"> C. Subjective narrative structure</label>
+                <label><input type="radio" name="q15" value="D"> D. Abstract-only presentation</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>28. You are tasked with compiling a collection of essays written by various authors centered around a specific theme. What type of academic text are you creating?</p>
+            <div class="options">
+                <label><input type="radio" name="q28" value="A" required> A. A Monograph</label>
+                <label><input type="radio" name="q28" value="B"> B. A Thesis</label>
+                <label><input type="radio" name="q28" value="C"> C. An Edited Volume</label>
+                <label><input type="radio" name="q28" value="D"> D. A Conference Paper</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>30. Evaluate the relationship between the structural components of an academic text. Why is it crucial that the "Results" section remains strictly factual, avoiding interpretation?</p>
+            <div class="options">
+                <label><input type="radio" name="q30" value="A" required> A. Because interpretation is reserved strictly for the "Introduction" where the thesis statement is formed.</label>
+                <label><input type="radio" name="q30" value="B"> B. Because the Results section must focus solely on what the research discovered, leaving the interpretation for the "Discussion" section.</label>
+                <label><input type="radio" name="q30" value="C"> C. Because academic texts avoid complex sentences in the middle sections.</label>
+                <label><input type="radio" name="q30" value="D"> D. Because factual data must always be hedged, and interpretation prevents the use of words like "may."</label>
+            </div>
+        </div>
+
+        <!-- PASSAGE 3 -->
+        <div class="passage-box">
+            <h3>Passage 3: Formal vs. Informal Language and Vocabulary</h3>
+            <p>The transition from everyday communication to academic writing requires a strict shift in vocabulary. While chatting with friends, a student might say, "I gotta help them out, IDK why this is so sick." However, such sentences contain contractions ("gotta", "didn't"), slang ("sick", "IDK"), and informal verbs ("help", "show"). In scholarly and formal contexts, these must be replaced with precise vocabulary such as "assist," "demonstrate," and "utilize."</p>
+        </div>
+
+        <div class="question-block">
+            <p>4. Which of the following words is classified as a contraction that should be avoided in formal writing?</p>
+            <div class="options">
+                <label><input type="radio" name="q4" value="A" required> A. Kinda</label>
+                <label><input type="radio" name="q4" value="B"> B. Gotta</label>
+                <label><input type="radio" name="q4" value="C"> C. Didn't</label>
+                <label><input type="radio" name="q4" value="D"> D. Sick</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>10. How should the everyday phrase "A lot of people like this" be transformed to meet academic standards?</p>
+            <div class="options">
+                <label><input type="radio" name="q10" value="A" required> A. "I think many people prefer this."</label>
+                <label><input type="radio" name="q10" value="B"> B. "A large number of individuals prefer this."</label>
+                <label><input type="radio" name="q10" value="C"> C. "The data demonstrates that people think this is sick."</label>
+                <label><input type="radio" name="q10" value="D"> D. "This is considered effective and beneficial by the masses."</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>11. A student wrote: "To be honest, I really don't like group projects because they are kinda confusing." Identify the correct classification of the flawed elements in this sentence based on academic standards.</p>
+            <div class="options">
+                <label><input type="radio" name="q11" value="A" required> A. "To be honest" is slang; "don't" is an informal word; "kinda" is a contraction.</label>
+                <label><input type="radio" name="q11" value="B"> B. "To be honest" is a personal expression; "don't" is a contraction; "kinda" is slang.</label>
+                <label><input type="radio" name="q11" value="C"> C. "To be honest" is a contraction; "don't" is a personal expression; "kinda" is slang.</label>
+                <label><input type="radio" name="q11" value="D"> D. "To be honest" is informal; "don't" is slang; "kinda" is a personal expression.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>12. Which formal vocabulary word should replace the informal word "help" in the sentence: "The teacher will help the students finish the project"?</p>
+            <div class="options">
+                <label><input type="radio" name="q12" value="A" required> A. Utilize</label>
+                <label><input type="radio" name="q12" value="B"> B. Commence</label>
+                <label><input type="radio" name="q12" value="C"> C. Demonstrate</label>
+                <label><input type="radio" name="q12" value="D"> D. Assist</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>13. If a researcher wants to replace the informal phrase "The study will show...", which formal verb is the most appropriate substitute?</p>
+            <div class="options">
+                <label><input type="radio" name="q13" value="A" required> A. Commence</label>
+                <label><input type="radio" name="q13" value="B"> B. Demonstrate</label>
+                <label><input type="radio" name="q13" value="C"> C. Subsequently</label>
+                <label><input type="radio" name="q13" value="D"> D. Utilize</label>
+            </div>
+        </div>
+        
+        <div class="question-block">
+            <p>20. Synthesize the following everyday ideas into a single, academically appropriate statement: “I don’t know why this happened. This is so confusing! I want to talk about how people act.”</p>
+            <div class="options">
+                <label><input type="radio" name="q20" value="A" required> A. The reason for this occurrence is not yet clear; therefore, this paper discusses the complex nature of human behavior.</label>
+                <label><input type="radio" name="q20" value="B"> B. I think this occurrence is confusing, so this paper will talk about how people act.</label>
+                <label><input type="radio" name="q20" value="C"> C. To be honest, this confusing event makes me want to explore human actions.</label>
+                <label><input type="radio" name="q20" value="D"> D. This occurrence is sick and confusing, subsequently demonstrating human behavior.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>21. Which combination of transformations correctly changes an informal sentence into a formal academic one?</p>
+            <div class="options">
+                <label><input type="radio" name="q21" value="A" required> A. Changing "we collected data; then, we looked at the results" to "we collected the data; subsequently, we analyzed the results."</label>
+                <label><input type="radio" name="q21" value="B"> B. Changing "I think this is good" to "This is super cool and beneficial."</label>
+                <label><input type="radio" name="q21" value="C"> C. Changing "The meeting will start" to "The meeting will assist."</label>
+                <label><input type="radio" name="q21" value="D"> D. Changing "Gotta study more" to "U should utilize more study time."</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>24. Read the sentence: "IDK why he didn't show up rn." Evaluate the severity of the informal elements present.</p>
+            <div class="options">
+                <label><input type="radio" name="q24" value="A" required> A. The sentence contains two slang terms ("IDK", "rn") and one contraction ("didn't"), rendering it highly inappropriate for academic writing.</label>
+                <label><input type="radio" name="q24" value="B"> B. The sentence contains a personal expression ("IDK") and two informal words ("didn't", "rn"), but is acceptable in formal essays.</label>
+                <label><input type="radio" name="q24" value="C"> C. The sentence contains only cohesive devices and hedging language.</label>
+                <label><input type="radio" name="q24" value="D"> D. The sentence relies on technical jargon that is too complex for professional communication.</label>
+            </div>
+        </div>
+
+        <!-- PASSAGE 4 -->
+        <div class="passage-box">
+            <h3>Passage 4: Academic vs. Professional Contexts</h3>
+            <p>While academic and professional communication share the goal of informing and persuading audiences clearly, their end goals differ. Academic communication focuses on theory development and contributing to scholarly knowledge. Professional communication, conversely, is highly practical; it values data-informed solutions that lead to organizational action. However, both realms demand evidence, whether it be statistical facts for a business proposal or peer-reviewed citations for a research thesis.</p>
+        </div>
+
+        <div class="question-block">
+            <p>5. What is a shared objective of both academic and professional communication?</p>
+            <div class="options">
+                <label><input type="radio" name="q5" value="A" required> A. They both primarily target colleagues, clients, and stakeholders.</label>
+                <label><input type="radio" name="q5" value="B"> B. They both rely strictly on specialized academic vocabulary to build theory.</label>
+                <label><input type="radio" name="q5" value="C"> C. They both aim to inform, persuade, and build understanding.</label>
+                <label><input type="radio" name="q5" value="D"> D. They both prioritize personal reflections to reach practical solutions.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>14. While both contexts require effective communication, how does the outcome of professional communication fundamentally differ from academic communication?</p>
+            <div class="options">
+                <label><input type="radio" name="q14" value="A" required> A. Professional communication values knowledge building; academic communication values solving immediate public crises.</label>
+                <label><input type="radio" name="q14" value="B"> B. Professional communication values solutions that lead to action and results; academic communication values knowledge and theory development.</label>
+                <label><input type="radio" name="q14" value="C"> C. Professional communication results in peer-reviewed journals; academic communication results in organizational memos.</label>
+                <label><input type="radio" name="q14" value="D"> D. There is no difference; both strictly outcome in theoretical frameworks.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>23. Assess the following professional email for formal vocabulary compliance: "We need to use our new software to help the team. The training will start tomorrow." Which revision applies the most accurate formal vocabulary?</p>
+            <div class="options">
+                <label><input type="radio" name="q23" value="A" required> A. We need to demonstrate our new software to assist the team. The training will utilize tomorrow.</label>
+                <label><input type="radio" name="q23" value="B"> B. We need to utilize our new software to assist the team. The training will commence tomorrow.</label>
+                <label><input type="radio" name="q23" value="C"> C. We gotta use our new software to assist the team. The training will subsequently start tomorrow.</label>
+                <label><input type="radio" name="q23" value="D"> D. We need to utilize our new software to help the team. The training will demonstrate tomorrow.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>25. Evaluate this statement: "Because professional communication aims to solve problems in the workplace, it does not need to rely on facts or evidence like academic communication does." Is this statement accurate?</p>
+            <div class="options">
+                <label><input type="radio" name="q25" value="A" required> A. Yes, professional communication relies purely on practical action, not evidence.</label>
+                <label><input type="radio" name="q25" value="B"> B. No, professional communication is data-informed and uses facts, examples, and practical results as evidence.</label>
+                <label><input type="radio" name="q25" value="C"> C. Yes, evidence is exclusively reserved for scholars and researchers.</label>
+                <label><input type="radio" name="q25" value="D"> D. No, professional communication requires scholarly citations and peer reviews to solve workplace problems.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>26. A scientist is preparing to present findings at a gathering of industry executives seeking actionable business solutions, rather than a university symposium. Based on the audience and purpose, what tone and language should the scientist prioritize?</p>
+            <div class="options">
+                <label><input type="radio" name="q26" value="A" required> A. Formal, theoretical, and analytical tone aimed at contributing to scholarship.</label>
+                <label><input type="radio" name="q26" value="B"> B. Casual, subjective, and simple tone to express feelings about the data.</label>
+                <label><input type="radio" name="q26" value="C"> C. Professional, clear, practical, and action-oriented tone.</label>
+                <label><input type="radio" name="q26" value="D"> D. Overly emotional language to persuade the stakeholders.</label>
+            </div>
+        </div>
+
+        <!-- PASSAGE 5 -->
+        <div class="passage-box">
+            <h3>Passage 5: Critical Reading and Evaluating Texts</h3>
+            <p>Whether examining everyday non-academic texts or rigorous scholarly research, students must employ critical reading strategies. When students evaluate text, they are assessing the credibility, spotting bias, and judging the strength of the arguments made. If a text makes sweeping assertions—such as declaring a scientific absolute without citing previous studies or data—it violates the core academic tenet of being evidence-based. Non-academic texts, on the other hand, often feature flexible structures intended merely to express feelings or entertain.</p>
+        </div>
+
+        <div class="question-block">
+            <p>16. Evaluate the following sentence for academic appropriateness: "The increasing use of mobile phones reflects a growing dependence on digital technology." What makes this sentence academically sound compared to its everyday equivalent?</p>
+            <div class="options">
+                <label><input type="radio" name="q16" value="A" required> A. It utilizes personal opinions to establish rapport with the reader.</label>
+                <label><input type="radio" name="q16" value="B"> B. It is specific, formal, objective, and avoids emotional reactions and general terms.</label>
+                <label><input type="radio" name="q16" value="C"> C. It utilizes complex jargon to obscure the primary meaning from non-academic audiences.</label>
+                <label><input type="radio" name="q16" value="D"> D. It relies heavily on slang to remain relatable.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>17. A peer reviewer criticizes a draft for being "overly emotional and opinion-based." According to the guidelines on what academic texts should avoid, how should the author revise the draft?</p>
+            <div class="options">
+                <label><input type="radio" name="q17" value="A" required> A. Over-simplify the concepts so the emotion is easier to understand.</label>
+                <label><input type="radio" name="q17" value="B"> B. Use a conversational tone to soften the emotional impact.</label>
+                <label><input type="radio" name="q17" value="C"> C. Remove the personal biases and rely strictly on clear, logical arguments supported by credible references.</label>
+                <label><input type="radio" name="q17" value="D"> D. Add more first-person language to clarify who holds the opinions.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>18. You are assessing the credibility of a research article. The author makes sweeping assertions about climate change without referencing any data or previous studies. Which core characteristic of academic writing has the author violated?</p>
+            <div class="options">
+                <label><input type="radio" name="q18" value="A" required> A. Being clear by avoiding complicated words.</label>
+                <label><input type="radio" name="q18" value="B"> B. Being organized with a logical introduction and conclusion.</label>
+                <label><input type="radio" name="q18" value="C"> C. Being evidence-based by supporting claims with data and citations.</label>
+                <label><input type="radio" name="q18" value="D"> D. Using specific jargon to establish authority.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>19. Evaluate the distinction between academic and non-academic texts. If an author writes a piece intended to "express feelings and entertain" using "flexible, often incomplete" structure, what is the most accurate classification of this text?</p>
+            <div class="options">
+                <label><input type="radio" name="q19" value="A" required> A. An academic monograph</label>
+                <label><input type="radio" name="q19" value="B"> B. Non-academic language</label>
+                <label><input type="radio" name="q19" value="C"> C. A professional proposal</label>
+                <label><input type="radio" name="q19" value="D"> D. An evidence-based review</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>22. An author is struggling to transition from an everyday tone to an academic tone. Which specific strategy is most effective for removing subjective bias?</p>
+            <div class="options">
+                <label><input type="radio" name="q22" value="A" required> A. Replacing basic vocabulary with highly obscure terminology.</label>
+                <label><input type="radio" name="q22" value="B"> B. Avoiding the first-person perspective unless explicitly required, and omitting emotional statements.</label>
+                <label><input type="radio" name="q22" value="C"> C. Relying entirely on cohesive devices without changing the root vocabulary.</label>
+                <label><input type="radio" name="q22" value="D"> D. Summarizing everyday conversations into text messages.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>27. A student submits an assignment that features the following sentence: "The results indicate a significant correlation between study habits and academic performance." Evaluate the context in which this language is most appropriate.</p>
+            <div class="options">
+                <label><input type="radio" name="q27" value="A" required> A. It is non-academic language used for everyday conversations and social media.</label>
+                <label><input type="radio" name="q27" value="B"> B. It is academic language, characterized by a formal, objective tone, and discipline-specific vocabulary.</label>
+                <label><input type="radio" name="q27" value="C"> C. It is professional communication designed to build working relationships with clients.</label>
+                <label><input type="radio" name="q27" value="D"> D. It is informal language containing personal opinions.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p>29. During the critical reading process of an academic text, a student is tasked with "assessing the credibility, bias, and strength of the arguments." Which stage of reading does this represent?</p>
+            <div class="options">
+                <label><input type="radio" name="q29" value="A" required> A. Preview</label>
+                <label><input type="radio" name="q29" value="B"> B. Identify</label>
+                <label><input type="radio" name="q29" value="C"> C. Analyze</label>
+                <label><input type="radio" name="q29" value="D"> D. Evaluate</label>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">Submit Examination</button>
+    </form>
+</div>
+
+<script>
+    let timerInterval;
+    const TIME_LIMIT = 40 * 60; // 40 minutes in seconds
+
+    function startExam() {
+        const nameInput = document.getElementById('studentName').value.trim();
+        const gradeInput = document.getElementById('studentGrade').value.trim();
+
+        if (nameInput === '' || gradeInput === '') {
+            alert('Please enter both your Name and Grade/Section to begin.');
+            return;
+        }
+
+        // Copy data to hidden form fields for submission
+        document.getElementById('hiddenName').value = nameInput;
+        document.getElementById('hiddenGrade').value = gradeInput;
+
+        // UI transitions
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('exam-screen').style.display = 'block';
+
+        // Start timer
+        startTimer(TIME_LIMIT);
+    }
+
+    function startTimer(duration) {
+        let timer = duration;
+        const display = document.getElementById('timeDisplay');
+        const timerBar = document.getElementById('timerBar');
+        
+        timerInterval = setInterval(function () {
+            let minutes = parseInt(timer / 60, 10);
+            let seconds = parseInt(timer % 60, 10);
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            display.textContent = minutes + ":" + seconds;
+
+            if (timer <= 300) { // Warning at 5 minutes
+                timerBar.classList.add('timer-warning');
+            }
+
+            if (--timer < 0) {
+                clearInterval(timerInterval);
+                display.textContent = "00:00";
+                alert("Time is up! Your answers are being submitted automatically.");
+                document.getElementById('exam-screen').submit();
+            }
+        }, 1000);
+    }
+
+    // Optional: Stop timer on manual submit so it doesn't trigger alerts during transition
+    document.getElementById('exam-screen').addEventListener('submit', function() {
+        clearInterval(timerInterval);
+    });
+</script>
+</body>
+</html>
